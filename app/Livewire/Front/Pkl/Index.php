@@ -9,29 +9,28 @@ use Livewire\Component;
 use App\Models\Industri;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
-use Livewire\Volt\Compilers\Mount;
 use Illuminate\Support\Facades\Auth;
 
 class Index extends Component
 {
     public $siswaId, $industriId, $guruId, $mulai, $selesai;
-    public $isOpen = 0;
+    public $isOpen = 0; // This is initialized to 0 (closed)
 
     use WithPagination;
 
-    public $rowPerPage=3;
+    public $rowPerPage = 3;
     public $search;
     public $userMail;
 
     public function mount(){
-        //membaca email user yang seddang login
+        //membaca email user yang sedang login
         $this->userMail = Auth::user()->email;
     }
 
     public function render()
     {
+        // Make sure your blade file is at resources/views/livewire/front/pkl/index.blade.php
         return view('livewire.front.pkl.index',[
-            'pkls' => Pkl::latest()->paginate($this->rowPerPage),
             'pkls' => $this->search === NULL ?
                         Pkl::latest()->paginate($this->rowPerPage) :
                         Pkl::latest()->whereHas('siswa', function ($query) {
@@ -40,13 +39,12 @@ class Index extends Component
                                     ->orWhereHas('industri', function ($query) {
                                                 $query->where('nama', 'like', '%' . $this->search . '%');
                                     })->paginate($this->rowPerPage),
-                // Pkl::latest()->where('pkls->siswas->id','like','%'.$this->search.'%')->paginate($this->rowPerPage),
 
             //mengakses record siswa yang emailnya sama dengan user yang sedang login
-            'siswa_login'=>Siswa::where('email','=',$this->userMail)->first(),
+            'siswa_login' => Siswa::where('email', '=', $this->userMail)->first(),
 
-            'industris'=>Industri::all(),
-            'gurus'=>Guru::all(),
+            'industris' => Industri::all(),
+            'gurus' => Guru::all(),
         ]);
     }
 
@@ -60,7 +58,6 @@ class Index extends Component
     {
         $this->isOpen = true;
     }
-
 
     public function closeModal()
     {
@@ -125,7 +122,7 @@ class Index extends Component
             DB::rollBack();
             // session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
             $this->closeModal();
-            return redirect()->route('pkl')->with('error', 'Terjadi kesalahan:');
+            return redirect()->route('pkl')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 }

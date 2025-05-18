@@ -1,20 +1,19 @@
 <?php
 
+use App\Livewire\Front\Siswa\Index as SiswaIndex;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Front\Pkl\Index;
 
-Route::get('/siswa', function () {
-    return "Siswa Test";
-})->middleware(['auth', 'verified','role:siswa','check_user_email'])
- ->name('siswa');
+Route::get('/siswa', SiswaIndex::class)
+    ->middleware(['auth', 'verified','role:siswa','check_user_email'])
+    ->name('siswa');
 
-Route::get('/pkl', function () {
-    return view('livewire.front.pkl.index');
-})->middleware(['auth', 'verified','role:siswa','check_user_email'])
- ->name('pkl');
+Route::get('/pkl', Index::class)
+    ->middleware(['auth', 'verified','role:siswa','check_user_email'])
+    ->name('pkl');
 
 Route::get('/', function () {
     return view('welcome');

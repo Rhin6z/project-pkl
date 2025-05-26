@@ -1,19 +1,29 @@
 <?php
 
-use App\Livewire\Front\Siswa\Index as SiswaIndex;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use Illuminate\Support\Facades\Route;
-use App\Livewire\Front\Pkl\Index;
+use App\Livewire\Front\Pkl\Index as PklIndex;
+use App\Livewire\Front\Siswa\Index as SiswaIndex;
+use App\Livewire\Front\Guru\Index as GuruIndex;
+use App\Livewire\Front\Industri\Index as IndustriIndex;
 
 Route::get('/siswa', SiswaIndex::class)
     ->middleware(['auth', 'verified','role:siswa','check_user_email'])
     ->name('siswa');
 
-Route::get('/pkl', Index::class)
+Route::get('/pkl', PklIndex::class)
     ->middleware(['auth', 'verified','role:siswa','check_user_email'])
     ->name('pkl');
+
+Route::get('/guru', GuruIndex::class)
+    ->middleware(['auth', 'verified','role:siswa','check_user_email'])
+    ->name('guru');
+
+Route::get('/industri', IndustriIndex::class)
+    ->middleware(['auth', 'verified','role:siswa','check_user_email'])
+    ->name('industri');
 
 Route::get('/', function () {
     return view('welcome');

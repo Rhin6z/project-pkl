@@ -1,33 +1,52 @@
 <?php
 
-namespace App\Livewire\Front;
+namespace App\Livewire\Front\Dashboard;
 
 use Livewire\Component;
-use App\Models\Siswa;
 use App\Models\Guru;
+use App\Models\Siswa;
 use App\Models\Industri;
 use App\Models\Pkl;
+use Illuminate\Support\Facades\Auth;
 
-class Dashboard extends Component
+class Index extends Component
 {
-    public $totalSiswa, $totalGuru, $totalIndustri, $totalLaporan, $persenLaporanDisetujui;
+    public $greeting;
+    public $currentTime;
 
     public function mount()
     {
-        $this->totalSiswa = Siswa::count();
-        $this->totalGuru = Guru::count();
-        $this->totalIndustri = Industri::count();
-        $this->totalLaporan = Pkl::count(); // ini masih oke buat total laporan (kalau relevan)
+        $hour = now()->format('H');
 
-        $disetujui = Siswa::where('status_lapor_pkl', '1')->count();
-        $this->persenLaporanDisetujui = $this->totalSiswa > 0
-            ? round(($disetujui / $this->totalSiswa) * 100, 2)
-            : 0;
+        if ($hour < 12) {
+            $this->greeting = 'Good Morning';
+        } elseif ($hour < 17) {
+            $this->greeting = 'Good Afternoon';
+        } else {
+            $this->greeting = 'Good Evening';
+        }
+
+        $this->currentTime = now()->format('l, F j, Y');
     }
 
     public function render()
     {
-        return view('livewire.front.dashboard.index');
+        $stats = [
+            'total_siswa' => Siswa::count(),
+            'total_guru' => Guru::count(),
+            'total_industri' => Industri::count(),
+            'total_pkl_aktif' => Pkl::whereDate('mulai', '<=', now())
+                                   ->whereDate('selesai', '>=', now())
+                                   ->count(),
+            'pkl_selesai' => Pkl::whereDate('selesai', '<', now())->count(),
+            'pkl_akan_datang' => Pkl::whereDate('mulai', '>', now())->count(),
+        ];
+
+        $recent_pkls = Pkl::with(['siswa', 'guru', 'industri'])
+                          ->latest()
+                          ->take(5)
+                          ->get();
+
+        return view('livewire.front.dashboard.index', compact('stats', 'recent_pkls'));
     }
 }
-

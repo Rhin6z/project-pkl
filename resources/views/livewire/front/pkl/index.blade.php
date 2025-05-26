@@ -26,7 +26,8 @@
       {{-- ./tampilan pesan --}}
 
       {{-- Judul --}}
-      <div class="w-full bg-gradient-to-r from-gray-700 to-emerald-800 p-6 text-center mb-4 rounded-lg">
+      <div class="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 p-6 text-center mb-4 rounded-lg">
+        <div class="absolute inset-0 bg-black opacity-10"></div>
         <h1 class="text-2xl font-bold text-white tracking-wider">LAPORAN SISWA PKL</h1>
         <p class="text-gray-200 mt-1">Sistem Informasi Jaringan dan Aplikasi</p>
       </div>

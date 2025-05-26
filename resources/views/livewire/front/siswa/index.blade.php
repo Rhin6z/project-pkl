@@ -26,7 +26,8 @@
       {{-- ./tampilan pesan --}}
 
       {{-- Judul --}}
-      <div class="w-full bg-gradient-to-r from-gray-700 to-emerald-800 p-6 text-center mb-4 rounded-lg">
+      <div class="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 p-6 text-center mb-4 rounded-lg">
+        <div class="absolute inset-0 bg-black opacity-10"></div>
         <h1 class="text-2xl font-bold text-white tracking-wider">DAFTAR SISWA</h1>
         <p class="text-gray-200 mt-1">Sistem Informasi Jaringan dan Aplikasi</p>
       </div>
@@ -44,21 +45,81 @@
         </div>
       </div>
       {{-- ./Info User --}}
+    {{-- Header Section with Stats and Search --}}
+    <div class="mx-auto mb-6">
+        {{-- Stats Cards Row --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2 gap-6 mb-6">
+            <!-- Total Siswa Card -->
+            <div class="bg-gray-800 bg-opacity-50 backdrop-blur-lg border border-gray-700 rounded-2xl p-6 hover:bg-opacity-70 transition-all duration-300 hover:scale-105">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm font-medium">Total Siswa</p>
+                        <p class="text-3xl font-bold text-white">{{ number_format($stats['total_siswa']) }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-500 bg-opacity-20 rounded-xl flex items-center justify-center">
+                        <span class="text-2xl">👥</span>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center">
+                    <span class="text-emerald-400 text-sm">↗️ Siswa Aktif</span>
+                </div>
+            </div>
 
-      {{-- Form Searching --}}
-      <div class="mx-auto flex flex-col md:flex-row md:items-center md:justify-between p-6 mb-4 bg-gray-800 rounded-lg border border-gray-700">
-          {{-- form searching --}}
-          <div class="relative w-full md:w-auto">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                  </svg>
-              </div>
-              <input wire:model.live="search" type="text" placeholder="Cari siswa..." class="pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 w-full md:w-80">
-          </div>
-          {{-- ./form searching --}}
-      </div>
-      {{-- ./Form Searching --}}
+            <!-- PKL Aktif -->
+            <div class="bg-gray-800 bg-opacity-50 backdrop-blur-lg border border-gray-700 rounded-2xl p-6 hover:bg-opacity-70 transition-all duration-300 hover:scale-105">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm font-medium">Status Lapor PKL</p>
+                        <p class="text-3xl font-bold text-emerald-400">{{ number_format($stats['status_lapor_pkl']) }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-500 bg-opacity-20 rounded-xl flex items-center justify-center">
+                        <span class="text-2xl">⚡</span>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center">
+                    <span class="text-emerald-400 text-sm">🔥 Sedang Aktif</span>
+                </div>
+            </div>
+        </div>
+
+        {{-- Search and Filter Section --}}
+        <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                {{-- Search Form --}}
+                <div class="flex-1 max-w-md">
+                    <label for="search" class="sr-only">Search students</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <input
+                            wire:model.live="search"
+                            type="text"
+                            id="search"
+                            name="search"
+                            placeholder="Cari siswa..."
+                            class="block w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                        >
+                    </div>
+                </div>
+
+                {{-- Additional Actions (Optional) --}}
+                <div class="flex items-center gap-3">
+                    {{-- Filter Button --}}
+                    <button class="inline-flex items-center px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 text-sm font-medium rounded-lg border border-gray-600 transition-colors duration-200">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                        </svg>
+                        Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+      {{-- ./Header Section with Stats and Search --}}
 
       {{-- Table Siswa --}}
       <div class="overflow-x-auto rounded-lg">

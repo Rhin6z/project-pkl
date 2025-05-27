@@ -1,6 +1,6 @@
 # Aplikasi Manajemen PKL (Praktik Kerja Lapangan)
 
-![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel)
+![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel)
 ![Filament](https://img.shields.io/badge/Filament-3.x-2C3E50?style=for-the-badge&logo=laravel)
 ![Livewire](https://img.shields.io/badge/Livewire-3.x-4B4B4B?style=for-the-badge&logo=livewire)
 ![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=for-the-badge&logo=php)
@@ -33,7 +33,7 @@ Aplikasi manajemen Praktik Kerja Lapangan (PKL) ini dibangun menggunakan framewo
 
 ## Teknologi yang Digunakan
 
-* **Backend:** Laravel 11
+* **Backend:** Laravel 12
 * **Database:** MySQL
 * **Admin Panel:** FilamentPHP 3.x
 * **Frontend Interactivity:** Laravel Livewire 3.x

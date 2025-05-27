@@ -48,7 +48,7 @@
                 </a>
 
                 <!-- Total Guru -->
-                <a href="{{ route('guru.index') }}" class="block group">
+                <a href="{{ route('guru') }}" class="block group">
                     <div class="bg-gray-800 bg-opacity-50 backdrop-blur-lg border border-gray-700 rounded-2xl p-6 hover:bg-opacity-70 transition-all duration-300 hover:scale-105 cursor-pointer group-hover:border-blue-500">
                         <div class="flex items-center justify-between">
                             <div>
@@ -67,7 +67,7 @@
                 </a>
 
                 <!-- Total Industri -->
-                <a href="{{ route('industri.index') }}" class="block group">
+                <a href="{{ route('industri') }}" class="block group">
                     <div class="bg-gray-800 bg-opacity-50 backdrop-blur-lg border border-gray-700 rounded-2xl p-6 hover:bg-opacity-70 transition-all duration-300 hover:scale-105 cursor-pointer group-hover:border-purple-500">
                         <div class="flex items-center justify-between">
                             <div>
@@ -147,7 +147,7 @@
             <div class="bg-gray-800 bg-opacity-50 backdrop-blur-lg border border-gray-700 rounded-2xl p-6">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-xl font-bold text-white">🔥 Recent PKL Activities</h3>
-                    <a href="{{ route('pkl.index') }}" class="text-emerald-400 hover:text-emerald-300 text-sm font-medium transition-colors duration-200">View All →</a>
+                    <a href="{{ route('pkl') }}" class="text-emerald-400 hover:text-emerald-300 text-sm font-medium transition-colors duration-200">View All →</a>
                 </div>
 
                 @if($recent_pkls->count() > 0)
@@ -189,15 +189,15 @@
                     <div class="text-2xl mb-2">➕</div>
                     <div class="font-medium">Add New PKL</div>
                 </a>
-                <a href="{{ route('siswa.index') }}" class="bg-blue-600 hover:bg-blue-700 text-white rounded-xl p-4 transition-all duration-200 hover:scale-105 hover:shadow-lg block text-center">
+                <a href="{{ route('siswa') }}" class="bg-blue-600 hover:bg-blue-700 text-white rounded-xl p-4 transition-all duration-200 hover:scale-105 hover:shadow-lg block text-center">
                     <div class="text-2xl mb-2">👥</div>
                     <div class="font-medium">Manage Students</div>
                 </a>
-                <a href="{{ route('industri.index') }}" class="bg-purple-600 hover:bg-purple-700 text-white rounded-xl p-4 transition-all duration-200 hover:scale-105 hover:shadow-lg block text-center">
+                <a href="{{ route('industri') }}" class="bg-purple-600 hover:bg-purple-700 text-white rounded-xl p-4 transition-all duration-200 hover:scale-105 hover:shadow-lg block text-center">
                     <div class="text-2xl mb-2">🏢</div>
                     <div class="font-medium">Partner Industries</div>
                 </a>
-                <a href="{{ route('laporan.index') }}" class="bg-orange-600 hover:bg-orange-700 text-white rounded-xl p-4 transition-all duration-200 hover:scale-105 hover:shadow-lg block text-center">
+                <a href="{{ route('laporan') }}" class="bg-orange-600 hover:bg-orange-700 text-white rounded-xl p-4 transition-all duration-200 hover:scale-105 hover:shadow-lg block text-center">
                     <div class="text-2xl mb-2">📊</div>
                     <div class="font-medium">View Reports</div>
                 </a>

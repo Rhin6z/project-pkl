@@ -42,24 +42,6 @@
                             class="w-full bg-gray-700 bg-opacity-50 border border-gray-600 rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
                         >
                     </div>
-
-                    <!-- Business Field Filter -->
-                    <div class="relative">
-                        <select
-                            wire:model.live="bidang_usaha"
-                            class="w-full bg-gray-700 bg-opacity-50 border border-gray-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 appearance-none"
-                        >
-                            <option value="">All Industries 🌐</option>
-                            @foreach($bidangUsahaOptions as $bidang)
-                                <option value="{{ $bidang }}">{{ $bidang }}</option>
-                            @endforeach
-                        </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

@@ -17,6 +17,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Filament\Navigation\NavigationGroup;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -27,8 +28,26 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandName('PKL Manager')
+            ->brandLogo(asset('images/logo-stembayo.png'))
+            ->favicon(asset('images/logo-stembayo.png'))
             ->colors([
                 'primary' => Color::Amber,
+                'gray' => Color::Slate,
+            ])
+            ->navigationGroups([
+                NavigationGroup::make()
+                    ->label('Data Master')
+                    ->icon('heroicon-o-user-group')
+                    ->collapsed(),
+                NavigationGroup::make()
+                    ->label('PKL Management')
+                    ->icon('heroicon-o-academic-cap')
+                    ->collapsed(),
+                NavigationGroup::make()
+                    ->label('Settings')
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->collapsed(),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
@@ -56,6 +75,16 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
-            ]);
+            ])
+            ->sidebarCollapsibleOnDesktop()
+            ->navigationItems([
+                NavigationItem::make('Analytics')
+                    ->icon('heroicon-o-presentation-chart-line')
+                    ->url(route('filament.admin.pages.analytics'))
+                    ->sort(2),
+            ])
+            ->topNavigation()
+            ->maxContentWidth('full')
+            ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }

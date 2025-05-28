@@ -10,19 +10,19 @@ use App\Livewire\Front\Guru\Index as GuruIndex;
 use App\Livewire\Front\Industri\Index as IndustriIndex;
 
 Route::get('/siswa', SiswaIndex::class)
-    ->middleware(['auth', 'verified','role:siswa','check_user_email'])
+    ->middleware(['auth', 'verified','role:guru','check_user_email'])
     ->name('siswa');
 
 Route::get('/pkl', PklIndex::class)
-    ->middleware(['auth', 'verified','role:siswa','check_user_email'])
+    ->middleware(['auth', 'verified','role:guru|siswa|admin','check_user_email'])
     ->name('pkl');
 
 Route::get('/guru', GuruIndex::class)
-    ->middleware(['auth', 'verified','role:siswa','check_user_email'])
+    ->middleware(['auth', 'verified','role:guru','check_user_email'])
     ->name('guru');
 
 Route::get('/industri', IndustriIndex::class)
-    ->middleware(['auth', 'verified','role:siswa','check_user_email'])
+    ->middleware(['auth', 'verified','role:guru|siswa|admin','check_user_email'])
     ->name('industri');
 
 Route::get('/', function () {
@@ -30,7 +30,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified','role:siswa','check_user_email'])
+    ->middleware(['auth', 'verified', 'role:guru|siswa|admin', 'check_user_email'])
     ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {

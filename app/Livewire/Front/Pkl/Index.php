@@ -94,7 +94,7 @@ class Index extends Component
                 DB::rollBack();
                 $this->closeModal();
 
-                return redirect()->route('pkl')->with('error', 'Transaksi dibatalkan: Siswa sudah melapor.');
+                return redirect()->route('pkl')->with('error', 'Input data error: Siswa sudah melapor.');
             }
 
             // Simpan data PKL

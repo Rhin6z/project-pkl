@@ -10,7 +10,7 @@ use App\Livewire\Front\Guru\Index as GuruIndex;
 use App\Livewire\Front\Industri\Index as IndustriIndex;
 
 Route::get('/siswa', SiswaIndex::class)
-    ->middleware(['auth', 'verified','role:guru','check_user_email'])
+    ->middleware(['auth', 'verified','role:guru|admin','check_user_email'])
     ->name('siswa');
 
 Route::get('/pkl', PklIndex::class)
@@ -18,7 +18,7 @@ Route::get('/pkl', PklIndex::class)
     ->name('pkl');
 
 Route::get('/guru', GuruIndex::class)
-    ->middleware(['auth', 'verified','role:guru','check_user_email'])
+    ->middleware(['auth', 'verified','role:guru|admin','check_user_email'])
     ->name('guru');
 
 Route::get('/industri', IndustriIndex::class)

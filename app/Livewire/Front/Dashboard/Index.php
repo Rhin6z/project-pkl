@@ -19,11 +19,11 @@ class Index extends Component
         $hour = now()->format('H');
 
         if ($hour < 12) {
-            $this->greeting = 'Good Morning';
+            $this->greeting = 'Selamat Pagi';
         } elseif ($hour < 17) {
-            $this->greeting = 'Good Afternoon';
+            $this->greeting = 'Selamat Siang';
         } else {
-            $this->greeting = 'Good Evening';
+            $this->greeting = 'Selamat Malam';
         }
 
         $this->currentTime = now()->format('l, F j, Y');

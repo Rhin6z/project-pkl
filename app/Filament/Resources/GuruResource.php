@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\GuruResource\Pages;
-use App\Filament\Resources\GuruResource\RelationManagers;
 use App\Models\Guru;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -11,37 +10,61 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Grid;
 
 class GuruResource extends Resource
 {
     protected static ?string $model = Guru::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
     protected static ?string $navigationLabel = 'Guru SIJA';
+    protected static ?string $navigationGroup = 'Data Master';
+    protected static ?int $navigationSort = 2;
+    protected static ?string $recordTitleAttribute = 'nama';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nama')
-                    ->required()
-                    ->maxLength(50),
-                Forms\Components\TextInput::make('nip')
-                    ->required()
-                    ->maxLength(18),
-                Forms\Components\TextInput::make('gender')
-                    ->required(),
-                Forms\Components\Textarea::make('alamat')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('kontak')
-                    ->required()
-                    ->maxLength(16),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->maxLength(30),
+                Card::make()
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('nama')
+                                    ->required()
+                                    ->maxLength(50)
+                                    ->label('Nama Lengkap'),
+                                TextInput::make('nip')
+                                    ->required()
+                                    ->maxLength(18)
+                                    ->label('NIP'),
+                                Select::make('gender')
+                                    ->required()
+                                    ->options([
+                                        'L' => 'Laki-laki',
+                                        'P' => 'Perempuan',
+                                    ])
+                                    ->label('Jenis Kelamin'),
+                                TextInput::make('kontak')
+                                    ->required()
+                                    ->maxLength(16)
+                                    ->tel()
+                                    ->label('Nomor Telepon'),
+                                TextInput::make('email')
+                                    ->email()
+                                    ->required()
+                                    ->maxLength(30)
+                                    ->label('Email'),
+                            ]),
+                        Forms\Components\Textarea::make('alamat')
+                            ->required()
+                            ->columnSpanFull()
+                            ->label('Alamat Lengkap'),
+                    ])
             ]);
     }
 
@@ -49,29 +72,43 @@ class GuruResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nama')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('nip')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('gender'),
-                Tables\Columns\TextColumn::make('kontak')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                TextColumn::make('nama')
+                    ->searchable()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Nama'),
+                TextColumn::make('nip')
+                    ->searchable()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('NIP'),
+                TextColumn::make('gender')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'L' => 'info',
+                        'P' => 'success',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'L' => 'Laki-laki',
+                        'P' => 'Perempuan',
+                    })
+                    ->label('Gender'),
+                TextColumn::make('kontak')
+                    ->searchable()
+                    ->label('Kontak'),
+                TextColumn::make('email')
+                    ->searchable()
+                    ->label('Email'),
             ])
             ->filters([
-                //
+                SelectFilter::make('gender')
+                    ->options([
+                        'L' => 'Laki-laki',
+                        'P' => 'Perempuan',
+                    ])
+                    ->label('Jenis Kelamin'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -94,5 +131,10 @@ class GuruResource extends Resource
             'create' => Pages\CreateGuru::route('/create'),
             'edit' => Pages\EditGuru::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
     }
 }

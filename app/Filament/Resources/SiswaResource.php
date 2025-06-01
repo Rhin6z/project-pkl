@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SiswaResource\Pages;
-use App\Filament\Resources\SiswaResource\RelationManagers;
 use App\Models\Siswa;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -11,39 +10,66 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Grid;
 
 class SiswaResource extends Resource
 {
     protected static ?string $model = Siswa::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $navigationLabel = 'Siswa SIJA';
+    protected static ?string $navigationGroup = 'Data Master';
+    protected static ?int $navigationSort = 1;
+    protected static ?string $recordTitleAttribute = 'nama';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nama')
-                    ->required()
-                    ->maxLength(50),
-                Forms\Components\TextInput::make('nis')
-                    ->required()
-                    ->maxLength(5),
-                Forms\Components\TextInput::make('gender')
-                    ->required(),
-                Forms\Components\Textarea::make('alamat')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('kontak')
-                    ->required()
-                    ->maxLength(16),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->maxLength(30),
-                Forms\Components\Toggle::make('status_lapor_pkl')
-                    ->required(),
+                Card::make()
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('nama')
+                                    ->required()
+                                    ->maxLength(50)
+                                    ->label('Nama Lengkap'),
+                                TextInput::make('nis')
+                                    ->required()
+                                    ->maxLength(5)
+                                    ->label('NIS'),
+                                Select::make('gender')
+                                    ->required()
+                                    ->options([
+                                        'L' => 'Laki-laki',
+                                        'P' => 'Perempuan',
+                                    ])
+                                    ->label('Jenis Kelamin'),
+                                TextInput::make('kontak')
+                                    ->required()
+                                    ->maxLength(16)
+                                    ->tel()
+                                    ->label('Nomor Telepon'),
+                                TextInput::make('email')
+                                    ->email()
+                                    ->required()
+                                    ->maxLength(30)
+                                    ->label('Email'),
+                                Toggle::make('status_lapor_pkl')
+                                    ->required()
+                                    ->label('Status Lapor PKL'),
+                            ]),
+                        Forms\Components\Textarea::make('alamat')
+                            ->required()
+                            ->columnSpanFull()
+                            ->label('Alamat Lengkap'),
+                    ])
             ]);
     }
 
@@ -51,31 +77,50 @@ class SiswaResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nama')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('nis')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('gender'),
-                Tables\Columns\TextColumn::make('kontak')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
-                Tables\Columns\IconColumn::make('status_lapor_pkl')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                TextColumn::make('nama')
+                    ->searchable()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Nama'),
+                TextColumn::make('nis')
+                    ->searchable()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('NIS'),
+                TextColumn::make('gender')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'L' => 'info',
+                        'P' => 'success',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'L' => 'Laki-laki',
+                        'P' => 'Perempuan',
+                    })
+                    ->label('Gender'),
+                TextColumn::make('kontak')
+                    ->searchable()
+                    ->label('Kontak'),
+                TextColumn::make('email')
+                    ->searchable()
+                    ->label('Email'),
+                IconColumn::make('status_lapor_pkl')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->label('Status PKL'),
             ])
             ->filters([
-                //
+                SelectFilter::make('gender')
+                    ->options([
+                        'L' => 'Laki-laki',
+                        'P' => 'Perempuan',
+                    ])
+                    ->label('Jenis Kelamin'),
+                Tables\Filters\TernaryFilter::make('status_lapor_pkl')
+                    ->label('Status PKL'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -98,5 +143,10 @@ class SiswaResource extends Resource
             'create' => Pages\CreateSiswa::route('/create'),
             'edit' => Pages\EditSiswa::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
     }
 }

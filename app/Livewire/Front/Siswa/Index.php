@@ -52,7 +52,7 @@ class Index extends Component
                 ->orWhere('nis', 'like', '%' . $this->search . '%')
                 ->orWhere('email', 'like', '%' . $this->search . '%')
                 ->paginate(10),
-            'siswa' => Siswa::where('email', '=', $this->userMail)->first(),
+            // 'siswa' => Siswa::where('email', '=', $this->userMail)->first(), //tidak digunakan karena untuk data seluruh siswa tidak bisa dilihat siswa lain
         ], compact('stats', 'recent_pkls'));
     }
 }

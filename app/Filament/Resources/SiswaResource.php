@@ -149,4 +149,8 @@ class SiswaResource extends Resource
     {
         return static::getModel()::count();
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> dev

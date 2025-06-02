@@ -18,18 +18,20 @@
             </flux:navlist>
 
             <flux:navlist variant="outline">
-                <flux:navlist.group :heading="__('Data Siswa PKL')" class="grid">
+                <flux:navlist.group :heading="__('Data PKL')" class="grid">
                     <flux:navlist.item icon="home" :href="route('pkl')" :current="request()->routeIs('pkl')" wire:navigate>{{ __('PKL') }}</flux:navlist.item>
-                    <flux:navlist.item icon="home" :href="route('siswa')" :current="request()->routeIs('siswa')" wire:navigate>{{ __('Siswa') }}</flux:navlist.item>
-                </flux:navlist.group>
-            </flux:navlist>
-
-            <flux:navlist variant="outline">
-                <flux:navlist.group :heading="__('Data Lain')" class="grid">
-                    <flux:navlist.item icon="home" :href="route('guru')" :current="request()->routeIs('guru')" wire:navigate>{{ __('Guru') }}</flux:navlist.item>
                     <flux:navlist.item icon="home" :href="route('industri')" :current="request()->routeIs('industri')" wire:navigate>{{ __('Industri') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
+
+            @if(!auth()->user()->hasRole('siswa'))
+            <flux:navlist variant="outline">
+                <flux:navlist.group :heading="__('Data Lain')" class="grid">
+                    <flux:navlist.item icon="home" :href="route('guru')" :current="request()->routeIs('guru')" wire:navigate>{{ __('Guru') }}</flux:navlist.item>
+                    <flux:navlist.item icon="home" :href="route('siswa')" :current="request()->routeIs('siswa')" wire:navigate>{{ __('Siswa') }}</flux:navlist.item>
+                </flux:navlist.group>
+            </flux:navlist>
+            @endif
 
             <flux:spacer />
 

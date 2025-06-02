@@ -137,4 +137,8 @@ class GuruResource extends Resource
     {
         return static::getModel()::count();
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> dev

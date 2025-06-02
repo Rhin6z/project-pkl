@@ -9,28 +9,31 @@ use App\Livewire\Front\Siswa\Index as SiswaIndex;
 use App\Livewire\Front\Guru\Index as GuruIndex;
 use App\Livewire\Front\Industri\Index as IndustriIndex;
 
+// Routes khusus untuk admin dan guru
 Route::get('/siswa', SiswaIndex::class)
-    ->middleware(['auth', 'verified','role:siswa','check_user_email'])
+    ->middleware(['auth', 'verified', 'role:guru|admin', 'check_user_email'])
     ->name('siswa');
 
-Route::get('/pkl', PklIndex::class)
-    ->middleware(['auth', 'verified','role:siswa','check_user_email'])
-    ->name('pkl');
-
 Route::get('/guru', GuruIndex::class)
-    ->middleware(['auth', 'verified','role:siswa','check_user_email'])
+    ->middleware(['auth', 'verified', 'role:guru|admin', 'check_user_email'])
     ->name('guru');
 
+// Routes yang bisa diakses oleh semua role (guru, siswa, admin)
+Route::get('/pkl', PklIndex::class)
+    ->middleware(['auth', 'verified', 'role:guru|siswa|admin', 'check_user_email'])
+    ->name('pkl');
+
 Route::get('/industri', IndustriIndex::class)
-    ->middleware(['auth', 'verified','role:siswa','check_user_email'])
+    ->middleware(['auth', 'verified', 'role:guru|siswa|admin', 'check_user_email'])
     ->name('industri');
 
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+// Dashboard route - akan mengarah ke dashboard yang sesuai berdasarkan role
 Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified','role:siswa','check_user_email'])
+    ->middleware(['auth', 'verified', 'role:guru|siswa|admin', 'check_user_email'])
     ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {

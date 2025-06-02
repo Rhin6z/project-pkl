@@ -128,4 +128,8 @@ class IndustriResource extends Resource
     {
         return static::getModel()::count();
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> dev

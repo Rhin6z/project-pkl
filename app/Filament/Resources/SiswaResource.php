@@ -16,8 +16,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Grid;
+use Filament\Notifications\Notification;
 
 class SiswaResource extends Resource
 {
@@ -32,7 +33,7 @@ class SiswaResource extends Resource
     {
         return $form
             ->schema([
-                Card::make()
+                Section::make('Informasi Siswa')
                     ->schema([
                         Grid::make(2)
                             ->schema([
@@ -120,11 +121,41 @@ class SiswaResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->before(function (Tables\Actions\DeleteAction $action, Siswa $record) {
+                        // Cek apakah siswa masih memiliki data PKL
+                        if ($record->pkls()->exists()) {
+                            Notification::make()
+                                ->title('Tidak dapat menghapus siswa!')
+                                ->body('Siswa ini masih memiliki data PKL yang terkait. Hapus data PKL terlebih dahulu.')
+                                ->danger()
+                                ->send();
+
+                            $action->cancel();
+                        }
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->before(function (Tables\Actions\DeleteBulkAction $action, $records) {
+                            $siswaWithPkl = [];
+                            foreach ($records as $record) {
+                                if ($record->pkls()->exists()) {
+                                    $siswaWithPkl[] = $record->nama;
+                                }
+                            }
+
+                            if (!empty($siswaWithPkl)) {
+                                Notification::make()
+                                    ->title('Tidak dapat menghapus beberapa siswa!')
+                                    ->body('Siswa berikut masih memiliki data PKL: ' . implode(', ', $siswaWithPkl))
+                                    ->danger()
+                                    ->send();
+
+                                $action->cancel();
+                            }
+                        }),
                 ]),
             ]);
     }
@@ -149,8 +180,4 @@ class SiswaResource extends Resource
     {
         return static::getModel()::count();
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> dev

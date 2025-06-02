@@ -39,7 +39,6 @@ class IndustriSeeder extends Seeder
                 'website' => 'https://www.quick.co.id/',
             ],
 
-            // Data tambahan dari sim.stembayo.sch.id
             [
                 'nama' => 'PT. Gagas Anagata Nusantara',
                 'bidang_usaha' => 'Manufaktur / Permesinan / Otomatisasi',

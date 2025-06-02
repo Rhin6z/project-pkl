@@ -149,8 +149,4 @@ class PklResource extends Resource
     {
         return static::getModel()::count();
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> dev

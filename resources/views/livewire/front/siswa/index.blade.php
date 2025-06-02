@@ -251,7 +251,7 @@ use Carbon\Carbon;
                                         </td>
                                         <td class="px-6 py-4">
                                             @if($siswa->status_lapor_pkl == 1)
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500 bg-opacity-20 text-emerald-400 border border-emerald-500 border-opacity-30">
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500 bg-opacity-20 text-white border border-emerald-500 border-opacity-30">
                                                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                     </svg>

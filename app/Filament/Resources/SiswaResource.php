@@ -18,8 +18,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
-use Filament\Notifications\Notification;
-use Illuminate\Database\QueryException;
 
 class SiswaResource extends Resource
 {
@@ -57,7 +55,9 @@ class SiswaResource extends Resource
                                     ->required()
                                     ->maxLength(16)
                                     ->tel()
-                                    ->label('Nomor Telepon'),
+                                    ->label('Nomor Telepon')
+                                    ->placeholder('0856123456 atau 856123456')
+                                    ->helperText('Nomor akan otomatis diformat menjadi +62'),
                                 TextInput::make('email')
                                     ->email()
                                     ->required()
@@ -122,63 +122,11 @@ class SiswaResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-
-                // Custom Delete Action dengan notifikasi
-                Tables\Actions\DeleteAction::make()
-                    ->before(function (Tables\Actions\DeleteAction $action, Siswa $record) {
-                        // Cek apakah siswa memiliki data PKL
-                        if ($record->pkls()->exists()) {
-                            // Batalkan aksi delete
-                            $action->cancel();
-
-                            // Tampilkan notifikasi error
-                            Notification::make()
-                                ->title('Tidak dapat menghapus siswa!')
-                                ->body('Siswa ' . $record->nama . ' masih memiliki data PKL yang terkait. Hapus data PKL terlebih dahulu sebelum menghapus siswa.')
-                                ->danger()
-                                ->persistent()
-                                ->send();
-                        }
-                    })
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    // Custom Bulk Delete Action
-                    Tables\Actions\DeleteBulkAction::make()
-                        ->action(function (Tables\Actions\DeleteBulkAction $action, $records) {
-                            $cannotDelete = [];
-                            $toDelete = [];
-
-                            foreach ($records as $record) {
-                                if ($record->pkls()->exists()) {
-                                    $cannotDelete[] = $record->nama;
-                                } else {
-                                    $toDelete[] = $record;
-                                }
-                            }
-
-                            // Hapus yang bisa dihapus
-                            if (!empty($toDelete)) {
-                                foreach ($toDelete as $record) {
-                                    $record->delete();
-                                }
-
-                                Notification::make()
-                                    ->title('Berhasil menghapus ' . count($toDelete) . ' siswa')
-                                    ->success()
-                                    ->send();
-                            }
-
-                            // Tampilkan peringatan untuk yang tidak bisa dihapus
-                            if (!empty($cannotDelete)) {
-                                Notification::make()
-                                    ->title('Beberapa siswa tidak dapat dihapus')
-                                    ->body('Siswa berikut masih memiliki data PKL: ' . implode(', ', $cannotDelete))
-                                    ->warning()
-                                    ->persistent()
-                                    ->send();
-                            }
-                        })
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -202,5 +150,27 @@ class SiswaResource extends Resource
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();
+    }
+
+    // Method untuk format nomor telepon
+    public static function formatPhoneNumber($phone)
+    {
+        // Hapus semua karakter non-numerik
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+
+        // Jika dimulai dengan 0, hapus 0 dan tambahkan +62
+        if (substr($phone, 0, 1) === '0') {
+            $phone = '+62' . substr($phone, 1);
+        }
+        // Jika dimulai dengan 62, tambahkan + di depan
+        elseif (substr($phone, 0, 2) === '62') {
+            $phone = '+' . $phone;
+        }
+        // Jika tidak dimulai dengan 0 atau 62, asumsikan nomor lokal dan tambahkan +62
+        elseif (!str_starts_with($phone, '+62')) {
+            $phone = '+62' . $phone;
+        }
+
+        return $phone;
     }
 }

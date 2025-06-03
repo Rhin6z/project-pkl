@@ -3,10 +3,12 @@
 namespace App\Livewire\Auth;
 
 use App\Models\User;
+use App\Models\Siswa;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -14,11 +16,8 @@ use Livewire\Component;
 class Register extends Component
 {
     public string $name = '';
-
     public string $email = '';
-
     public string $password = '';
-
     public string $password_confirmation = '';
 
     /**
@@ -28,13 +27,33 @@ class Register extends Component
     {
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => [
+                'required',
+                'string',
+                'lowercase',
+                'email',
+                'max:255',
+                'unique:'.User::class,
+                function ($attribute, $value, $fail) {
+                    // Check if email exists in siswa table
+                    $siswa = Siswa::where('email', $value)->first();
+                    if (!$siswa) {
+                        $fail('Email tidak terdaftar sebagai siswa.');
+                    }
+                },
+            ],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
 
-        event(new Registered(($user = User::create($validated))));
+        // Create user
+        $user = User::create($validated);
+
+        // Assign 'siswa' role to the user
+        $user->assignRole('siswa');
+
+        event(new Registered($user));
 
         Auth::login($user);
 

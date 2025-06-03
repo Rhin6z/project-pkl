@@ -19,6 +19,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
 use Filament\Notifications\Notification;
+use Illuminate\Validation\ValidationException;
 
 class SiswaResource extends Resource
 {
@@ -44,7 +45,15 @@ class SiswaResource extends Resource
                                 TextInput::make('nis')
                                     ->required()
                                     ->maxLength(5)
-                                    ->label('NIS'),
+                                    ->label('NIS')
+                                    ->unique(
+                                        table: 'siswas',
+                                        column: 'nis',
+                                        ignoreRecord: true
+                                    )
+                                    ->validationMessages([
+                                        'unique' => 'NIS ini sudah digunakan oleh siswa lain. Silakan gunakan NIS yang berbeda.',
+                                    ]),
                                 Select::make('gender')
                                     ->required()
                                     ->options([
@@ -63,7 +72,36 @@ class SiswaResource extends Resource
                                     ->email()
                                     ->required()
                                     ->maxLength(30)
-                                    ->label('Email'),
+                                    ->label('Email')
+                                    ->unique(
+                                        table: 'siswas',
+                                        column: 'email',
+                                        ignoreRecord: true
+                                    )
+                                    ->validationMessages([
+                                        'unique' => 'Email ini sudah digunakan oleh siswa lain. Silakan gunakan email yang berbeda.',
+                                        'email' => 'Format email tidak valid.',
+                                        'max' => 'Email tidak boleh lebih dari 30 karakter.',
+                                    ])
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get, $component) {
+                                        if (!empty($state)) {
+                                            // Cek apakah email sudah ada di database
+                                            $existingEmail = Siswa::where('email', $state)
+                                                ->when($component->getRecord(), function ($query) use ($component) {
+                                                    $query->where('id', '!=', $component->getRecord()->id);
+                                                })
+                                                ->first();
+
+                                            if ($existingEmail) {
+                                                Notification::make()
+                                                    ->title('Email Sudah Digunakan!')
+                                                    ->body("Email '{$state}' sudah digunakan oleh siswa: {$existingEmail->nama}")
+                                                    ->danger()
+                                                    ->duration(5000)
+                                                    ->send();
+                                            }
+                                        }
+                                    }),
                                 Toggle::make('status_lapor_pkl')
                                     ->required()
                                     ->label('Status Lapor PKL'),
@@ -124,28 +162,21 @@ class SiswaResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
 
-                // Custom Delete Action dengan notifikasi
+                // Delete Action hanya tampil jika siswa tidak memiliki data PKL
                 Tables\Actions\DeleteAction::make()
-                    ->before(function (Tables\Actions\DeleteAction $action, Siswa $record) {
-                        // Cek apakah siswa memiliki data PKL
-                        if ($record->pkls()->exists()) {
-                            // Batalkan aksi delete
-                            $action->cancel();
-
-                            // Tampilkan notifikasi error
-                            Notification::make()
-                                ->title('Tidak dapat menghapus siswa!')
-                                ->body('Siswa ' . $record->nama . ' masih memiliki data PKL yang terkait. Hapus data PKL terlebih dahulu sebelum menghapus siswa.')
-                                ->danger()
-                                ->persistent()
-                                ->send();
-                        }
-                    }),
+                    ->visible(fn (Siswa $record): bool =>
+                        // Hanya tampilkan tombol delete jika siswa tidak memiliki data PKL
+                        !$record->pkls()->exists()
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    // Custom Bulk Delete Action
+                    // Bulk Delete Action hanya tampil jika ada siswa yang bisa dihapus
                     Tables\Actions\DeleteBulkAction::make()
+                        ->visible(fn (): bool =>
+                            // Hanya tampilkan bulk delete jika ada siswa yang tidak memiliki data PKL
+                            static::getModel()::whereDoesntHave('pkls')->exists()
+                        )
                         ->action(function (Tables\Actions\DeleteBulkAction $action, $records) {
                             $cannotDelete = [];
                             $toDelete = [];

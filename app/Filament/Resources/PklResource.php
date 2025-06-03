@@ -120,19 +120,11 @@ class PklResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
-                    ->visible(fn (Pkl $record): bool =>
-                        // Hanya tampilkan tombol delete jika PKL sudah selesai
-                        $record->selesai < now()
-                    ),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn (): bool =>
-                            // Hanya tampilkan bulk delete jika ada PKL yang sudah selesai
-                            static::getModel()::where('selesai', '<', now())->exists()
-                        ),
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

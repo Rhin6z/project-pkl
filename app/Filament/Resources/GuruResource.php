@@ -16,6 +16,7 @@ use Filament\Forms\Components\Select;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
+use Filament\Notifications\Notification;
 
 class GuruResource extends Resource
 {
@@ -110,11 +111,63 @@ class GuruResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+
+                // Custom Delete Action dengan notifikasi
+                Tables\Actions\DeleteAction::make()
+                    ->before(function (Tables\Actions\DeleteAction $action, Guru $record) {
+                        // Cek apakah guru memiliki data PKL yang terkait
+                        if ($record->pkls()->exists()) {
+                            // Batalkan aksi delete
+                            $action->cancel();
+
+                            // Tampilkan notifikasi error
+                            Notification::make()
+                                ->title('Tidak dapat menghapus guru!')
+                                ->body('Guru ' . $record->nama . ' masih memiliki data PKL yang terkait sebagai pembimbing. Hapus atau ubah data PKL terlebih dahulu sebelum menghapus guru.')
+                                ->danger()
+                                ->persistent()
+                                ->send();
+                        }
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    // Custom Bulk Delete Action
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->action(function (Tables\Actions\DeleteBulkAction $action, $records) {
+                            $cannotDelete = [];
+                            $toDelete = [];
+
+                            foreach ($records as $record) {
+                                if ($record->pkls()->exists()) {
+                                    $cannotDelete[] = $record->nama;
+                                } else {
+                                    $toDelete[] = $record;
+                                }
+                            }
+
+                            // Hapus yang bisa dihapus
+                            if (!empty($toDelete)) {
+                                foreach ($toDelete as $record) {
+                                    $record->delete();
+                                }
+
+                                Notification::make()
+                                    ->title('Berhasil menghapus ' . count($toDelete) . ' guru')
+                                    ->success()
+                                    ->send();
+                            }
+
+                            // Tampilkan peringatan untuk yang tidak bisa dihapus
+                            if (!empty($cannotDelete)) {
+                                Notification::make()
+                                    ->title('Beberapa guru tidak dapat dihapus')
+                                    ->body('Guru berikut masih memiliki data PKL sebagai pembimbing: ' . implode(', ', $cannotDelete))
+                                    ->warning()
+                                    ->persistent()
+                                    ->send();
+                            }
+                        })
                 ]),
             ]);
     }

@@ -15,9 +15,12 @@ class EditSiswa extends EditRecord
         return [
             Actions\DeleteAction::make()
                 ->visible(fn (): bool =>
-                    // Hanya tampilkan tombol delete jika PKL sudah selesai
-                    $this->record->selesai < now()
-                ),
+                    // Hanya tampilkan tombol delete jika siswa tidak memiliki data PKL
+                    !$this->record->pkls()->exists()
+                )
+                ->label('Hapus Siswa')
+                ->color('danger')
+                ->icon('heroicon-o-trash'),
         ];
     }
 

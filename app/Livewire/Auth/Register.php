@@ -50,8 +50,8 @@ class Register extends Component
         // Create user
         $user = User::create($validated);
 
-        // Assign 'siswa' role to the user
-        $user->assignRole('siswa');
+        // // Assign 'siswa' role to the user
+        // $user->assignRole('siswa');
 
         event(new Registered($user));
 

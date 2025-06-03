@@ -78,6 +78,7 @@
                     </div>
 
                     <!-- Add Industry Button -->
+                    @if(auth()->user()->hasRole('guru|admin'))
                     <div class="flex items-center justify-end">
                         <button
                             wire:click="create()"
@@ -89,6 +90,7 @@
                             Tambah Industri
                         </button>
                     </div>
+                    @endif
                 </div>
 
                 <!-- Active Filters Display -->

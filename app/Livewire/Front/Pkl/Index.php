@@ -58,7 +58,6 @@ class Index extends Component
             }
         }
 
-        // Get siswa_login untuk keperluan form
         $siswa_login = null;
         if ($isStudent) {
             $siswa_login = Siswa::where('email', $currentUser->email)->first();
@@ -91,10 +90,22 @@ class Index extends Component
     {
         $this->validate();
 
-        // Validasi siswa sudah lapor
+        // Validasi siswa udh lapor
         $siswa = Siswa::find($this->siswaId);
         if ($siswa->status_lapor_pkl) {
             session()->flash('error', 'Siswa sudah melapor PKL.');
+            $this->isOpen = false;
+            return;
+        }
+
+        // Validasi durasi minimal 90 hari
+        $mulai = \Carbon\Carbon::parse($this->mulai);
+        $selesai = \Carbon\Carbon::parse($this->selesai);
+        $selisih = $mulai->diffInDays($selesai);
+
+        if ($selisih < 90) {
+            session()->flash('error', 'Durasi PKL minimal 90 hari.');
+            $this->isOpen = false;
             return;
         }
 

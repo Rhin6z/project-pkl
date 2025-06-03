@@ -16,4 +16,14 @@ class EditSiswa extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        // Format nomor telepon sebelum menyimpan
+        if (isset($data['kontak'])) {
+            $data['kontak'] = SiswaResource::formatPhoneNumber($data['kontak']);
+        }
+
+        return $data;
+    }
 }

@@ -5,9 +5,8 @@
         <div class="relative mx-auto max-w-7xl">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-4xl font-bold text-white mb-2">👨‍🏫 Teachers Directory</h1>
-                    <p class="text-emerald-100 text-lg">Discover our amazing teaching staff</p>
-                    <p class="text-emerald-200 mt-2">Connect with mentors who shape the future</p>
+                    <h1 class="text-4xl font-bold text-white mb-2">👨‍🏫 Daftar Guru</h1>
+                    <p class="text-emerald-200 mt-2">Daftar guru jurusan SIJA</p>
                 </div>
                 <div class="hidden md:block">
                     <div class="w-32 h-32 bg-white bg-opacity-20 rounded-full flex items-center justify-center">

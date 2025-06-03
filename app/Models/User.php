@@ -61,13 +61,51 @@ class User extends Authenticatable
             ->implode('');
     }
 
+    /**
+     * Check if user's email is verified
+     */
     public function hasVerifiedEmail(): bool
     {
         return !is_null($this->email_verified_at);
     }
 
+    /**
+     * Get avatar URL
+     */
     public function getAvatarUrlAttribute(): string
     {
         return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
+    }
+
+    // Event listener untuk sinkronisasi email
+    protected static function booted()
+    {
+        static::updated(function ($user) {
+            // Cek apakah email yang diubah
+            if ($user->isDirty('email')) {
+                $oldEmail = $user->getOriginal('email');
+                $newEmail = $user->email;
+
+                // Update email di tabel guru
+                \App\Models\Guru::where('email', $oldEmail)
+                    ->update(['email' => $newEmail]);
+
+                // Update email di tabel siswa
+                \App\Models\Siswa::where('email', $oldEmail)
+                    ->update(['email' => $newEmail]);
+            }
+        });
+    }
+
+    // Relasi ke Guru (opsional, jika diperlukan)
+    public function guru()
+    {
+        return $this->hasOne(\App\Models\Guru::class, 'email', 'email');
+    }
+
+    // Relasi ke Siswa (opsional, jika diperlukan)
+    public function siswa()
+    {
+        return $this->hasOne(\App\Models\Siswa::class, 'email', 'email');
     }
 }

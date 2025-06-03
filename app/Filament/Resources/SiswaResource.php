@@ -16,9 +16,10 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
 use Filament\Notifications\Notification;
+use Illuminate\Database\QueryException;
 
 class SiswaResource extends Resource
 {
@@ -33,7 +34,7 @@ class SiswaResource extends Resource
     {
         return $form
             ->schema([
-                Section::make('Informasi Siswa')
+                Card::make()
                     ->schema([
                         Grid::make(2)
                             ->schema([
@@ -121,41 +122,63 @@ class SiswaResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+
+                // Custom Delete Action dengan notifikasi
                 Tables\Actions\DeleteAction::make()
                     ->before(function (Tables\Actions\DeleteAction $action, Siswa $record) {
-                        // Cek apakah siswa masih memiliki data PKL
+                        // Cek apakah siswa memiliki data PKL
                         if ($record->pkls()->exists()) {
+                            // Batalkan aksi delete
+                            $action->cancel();
+
+                            // Tampilkan notifikasi error
                             Notification::make()
                                 ->title('Tidak dapat menghapus siswa!')
-                                ->body('Siswa ini masih memiliki data PKL yang terkait. Hapus data PKL terlebih dahulu.')
+                                ->body('Siswa ' . $record->nama . ' masih memiliki data PKL yang terkait. Hapus data PKL terlebih dahulu sebelum menghapus siswa.')
                                 ->danger()
+                                ->persistent()
                                 ->send();
-
-                            $action->cancel();
                         }
-                    }),
+                    })
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    // Custom Bulk Delete Action
                     Tables\Actions\DeleteBulkAction::make()
-                        ->before(function (Tables\Actions\DeleteBulkAction $action, $records) {
-                            $siswaWithPkl = [];
+                        ->action(function (Tables\Actions\DeleteBulkAction $action, $records) {
+                            $cannotDelete = [];
+                            $toDelete = [];
+
                             foreach ($records as $record) {
                                 if ($record->pkls()->exists()) {
-                                    $siswaWithPkl[] = $record->nama;
+                                    $cannotDelete[] = $record->nama;
+                                } else {
+                                    $toDelete[] = $record;
                                 }
                             }
 
-                            if (!empty($siswaWithPkl)) {
-                                Notification::make()
-                                    ->title('Tidak dapat menghapus beberapa siswa!')
-                                    ->body('Siswa berikut masih memiliki data PKL: ' . implode(', ', $siswaWithPkl))
-                                    ->danger()
-                                    ->send();
+                            // Hapus yang bisa dihapus
+                            if (!empty($toDelete)) {
+                                foreach ($toDelete as $record) {
+                                    $record->delete();
+                                }
 
-                                $action->cancel();
+                                Notification::make()
+                                    ->title('Berhasil menghapus ' . count($toDelete) . ' siswa')
+                                    ->success()
+                                    ->send();
                             }
-                        }),
+
+                            // Tampilkan peringatan untuk yang tidak bisa dihapus
+                            if (!empty($cannotDelete)) {
+                                Notification::make()
+                                    ->title('Beberapa siswa tidak dapat dihapus')
+                                    ->body('Siswa berikut masih memiliki data PKL: ' . implode(', ', $cannotDelete))
+                                    ->warning()
+                                    ->persistent()
+                                    ->send();
+                            }
+                        })
                 ]),
             ]);
     }

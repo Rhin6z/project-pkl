@@ -16,8 +16,6 @@ use Filament\Forms\Components\Select;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
-use Filament\Notifications\Notification;
-use Illuminate\Database\QueryException;
 
 class GuruResource extends Resource
 {
@@ -55,7 +53,9 @@ class GuruResource extends Resource
                                     ->required()
                                     ->maxLength(16)
                                     ->tel()
-                                    ->label('Nomor Telepon'),
+                                    ->label('Nomor Telepon')
+                                    ->placeholder('0856123456 atau 856123456')
+                                    ->helperText('Nomor akan otomatis diformat menjadi +62'),
                                 TextInput::make('email')
                                     ->email()
                                     ->required()
@@ -103,103 +103,18 @@ class GuruResource extends Resource
             ->filters([
                 SelectFilter::make('gender')
                     ->options([
-                        'L',
-                        'P',
+                        'L' => 'Laki-laki',
+                        'P' => 'Perempuan',
                     ])
                     ->label('Jenis Kelamin'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                // Custom Delete Action with error handling
-                Tables\Actions\DeleteAction::make()
-                    ->action(function ($record) {
-                        try {
-                            $record->delete();
-
-                            Notification::make()
-                                ->title('Berhasil dihapus')
-                                ->body('Data guru berhasil dihapus.')
-                                ->success()
-                                ->send();
-
-                        } catch (QueryException $e) {
-                            // Check if it's a foreign key constraint error
-                            if ($e->getCode() === '23000') {
-                                Notification::make()
-                                    ->title('Tidak dapat menghapus data')
-                                    ->body('Data guru ini tidak dapat dihapus karena masih terkait dengan data lain (seperti PKL atau mata pelajaran). Silakan hapus data terkait terlebih dahulu.')
-                                    ->danger()
-                                    ->persistent()
-                                    ->send();
-                            } else {
-                                Notification::make()
-                                    ->title('Terjadi kesalahan')
-                                    ->body('Gagal menghapus data guru. Silakan coba lagi.')
-                                    ->danger()
-                                    ->send();
-                            }
-                        }
-                    })
-                    ->requiresConfirmation()
-                    ->modalHeading('Hapus Data Guru')
-                    ->modalDescription('Apakah Anda yakin ingin menghapus data guru ini? Data yang sudah dihapus tidak dapat dikembalikan.')
-                    ->modalSubmitActionLabel('Ya, Hapus'),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    // Custom Bulk Delete Action with error handling
-                    Tables\Actions\BulkAction::make('delete')
-                        ->label('Hapus Terpilih')
-                        ->icon('heroicon-o-trash')
-                        ->color('danger')
-                        ->action(function ($records) {
-                            $deletedCount = 0;
-                            $failedCount = 0;
-                            $constraintFailures = [];
-
-                            foreach ($records as $record) {
-                                try {
-                                    $record->delete();
-                                    $deletedCount++;
-                                } catch (QueryException $e) {
-                                    if ($e->getCode() === '23000') {
-                                        $constraintFailures[] = $record->nama;
-                                        $failedCount++;
-                                    } else {
-                                        $failedCount++;
-                                    }
-                                }
-                            }
-
-                            // Show appropriate notifications
-                            if ($deletedCount > 0) {
-                                Notification::make()
-                                    ->title('Berhasil menghapus ' . $deletedCount . ' data guru')
-                                    ->success()
-                                    ->send();
-                            }
-
-                            if (count($constraintFailures) > 0) {
-                                Notification::make()
-                                    ->title('Beberapa data tidak dapat dihapus')
-                                    ->body('Data guru berikut tidak dapat dihapus karena masih terkait dengan data lain: ' . implode(', ', $constraintFailures))
-                                    ->warning()
-                                    ->persistent()
-                                    ->send();
-                            }
-
-                            if ($failedCount > 0 && count($constraintFailures) === 0) {
-                                Notification::make()
-                                    ->title('Gagal menghapus ' . $failedCount . ' data')
-                                    ->body('Terjadi kesalahan saat menghapus beberapa data.')
-                                    ->danger()
-                                    ->send();
-                            }
-                        })
-                        ->requiresConfirmation()
-                        ->modalHeading('Hapus Data Guru Terpilih')
-                        ->modalDescription('Apakah Anda yakin ingin menghapus semua data guru yang dipilih? Data yang sudah dihapus tidak dapat dikembalikan.')
-                        ->modalSubmitActionLabel('Ya, Hapus Semua'),
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -223,5 +138,27 @@ class GuruResource extends Resource
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();
+    }
+
+    // Method untuk format nomor telepon
+    public static function formatPhoneNumber($phone)
+    {
+        // Hapus semua karakter non-numerik
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+
+        // Jika dimulai dengan 0, hapus 0 dan tambahkan +62
+        if (substr($phone, 0, 1) === '0') {
+            $phone = '+62' . substr($phone, 1);
+        }
+        // Jika dimulai dengan 62, tambahkan + di depan
+        elseif (substr($phone, 0, 2) === '62') {
+            $phone = '+' . $phone;
+        }
+        // Jika tidak dimulai dengan 0 atau 62, asumsikan nomor lokal dan tambahkan +62
+        elseif (!str_starts_with($phone, '+62')) {
+            $phone = '+62' . $phone;
+        }
+
+        return $phone;
     }
 }

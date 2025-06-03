@@ -26,7 +26,12 @@ class Siswa extends Model
 
     public function pkls()
     {
-        return $this->hasMany(Pkl::class);
+        return $this->hasMany(Pkl::class, 'siswa_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'email', 'email');
     }
 
 }

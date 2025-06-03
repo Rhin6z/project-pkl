@@ -106,25 +106,6 @@ use Carbon\Carbon;
                         <span class="text-emerald-400 text-sm">🔥 Sedang Aktif</span>
                     </div>
                 </div>
-
-                <!-- Gender Distribution Card -->
-                <div class="bg-gray-800 bg-opacity-50 backdrop-blur-lg border border-gray-700 rounded-2xl p-6 hover:bg-opacity-70 transition-all duration-300 hover:scale-105">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-400 text-sm font-medium">Distribusi Gender</p>
-                            <p class="text-lg font-bold text-white">
-                                <span class="text-blue-400">L: {{ $stats['gender_l'] ?? 0 }}</span> |
-                                <span class="text-pink-400">P: {{ $stats['gender_p'] ?? 0 }}</span>
-                            </p>
-                        </div>
-                        <div class="w-12 h-12 bg-purple-500 bg-opacity-20 rounded-xl flex items-center justify-center">
-                            <span class="text-2xl">⚖️</span>
-                        </div>
-                    </div>
-                    <div class="mt-4 flex items-center">
-                        <span class="text-purple-400 text-sm">📊 Data Gender</span>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -265,7 +246,7 @@ use Carbon\Carbon;
                                                 </span>
                                             @endif
                                         </td>
-                                        
+
                                     </tr>
                                 @endforeach
                             </tbody>

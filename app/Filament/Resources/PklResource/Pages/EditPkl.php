@@ -13,7 +13,11 @@ class EditPkl extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->visible(fn (): bool =>
+                    // Hanya tampilkan tombol delete jika PKL sudah selesai
+                    $this->record->selesai < now()
+                ),
         ];
     }
 }
